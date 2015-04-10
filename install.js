@@ -3,7 +3,7 @@
 var AdmZip = require('adm-zip')
 var cp = require('child_process')
 var fs = require('fs')
-var helper = require('./lib/chromedriver')
+var helper = require('./lib/operadriver')
 var http = require('http')
 var kew = require('kew')
 var npmconf = require('npmconf')
@@ -13,11 +13,14 @@ var rimraf = require('rimraf').sync
 var url = require('url')
 var util = require('util')
 
-var libPath = path.join(__dirname, 'lib', 'chromedriver')
-var cdnUrl = process.env.npm_config_chromedriver_cdnurl || process.env.CHROMEDRIVER_CDNURL || 'http://chromedriver.storage.googleapis.com'
-// adapt http://chromedriver.storage.googleapis.com/
+var libPath = path.join(__dirname, 'lib', 'operadriver')
+var cdnUrl = process.env.npm_config_operadriver_cdnurl ||
+  process.env.OPERADRIVER_CDNURL ||
+  'http://78red6.com5.z0.glb.qiniucdn.com/dist/operadriver'
+  // 'http://cnpmjs.org/mirrors/operadriver'
 cdnUrl = cdnUrl.replace(/\/+$/, '')
-var downloadUrl = cdnUrl + '/%s/chromedriver_%s.zip'
+// var downloadUrl = cdnUrl + '/%s/operadriver_%s.zip'
+var downloadUrl = cdnUrl + '/operadriver_%s.zip'
 var platform = process.platform
 
 if (platform === 'linux') {
@@ -27,13 +30,17 @@ if (platform === 'linux') {
     platform += '32'
   }
 } else if (platform === 'darwin') {
-  platform = 'mac32'
+  if (process.arch === 'x64') {
+    platform = 'mac32'
+  } else {
+    platform = 'mac32'
+  }
 } else if (platform !== 'win32') {
   console.log('Unexpected platform or architecture:', process.platform, process.arch)
   process.exit(1)
 }
 
-downloadUrl = util.format(downloadUrl, helper.version, platform);
+downloadUrl = util.format(downloadUrl, platform);
 
 var fileName = downloadUrl.split('/').pop()
 
@@ -66,10 +73,11 @@ npmconf.load(function(err, conf) {
     return fixFilePermissions()
   })
   .then(function () {
-    console.log('Done. ChromeDriver binary available at', helper.path)
+    console.log('Done. OperaDriver binary available at', helper.path)
   })
   .fail(function (err) {
-    console.error('ChromeDriver installation failed', err.stack)
+    console.log(err)
+    console.error('OperaDriver installation failed', err.stack)
     process.exit(1)
   })
 })
@@ -84,7 +92,7 @@ function findSuitableTempDirectory(npmConf) {
   ]
 
   for (var i = 0; i < candidateTmpDirs.length; i++) {
-    var candidatePath = path.join(candidateTmpDirs[i], 'chromedriver')
+    var candidatePath = path.join(candidateTmpDirs[i], 'operadriver')
 
     try {
       mkdirp.sync(candidatePath, '0777')
@@ -97,7 +105,7 @@ function findSuitableTempDirectory(npmConf) {
     }
   }
 
-  console.error('Can not find a writable tmp directory, please report issue on https://github.com/giggio/chromedriver/issues/ with as much information as possible.');
+  console.error('Can not find a writable tmp directory, please report issue on https://github.com/cnpm/operadriver/issues/ with as much information as possible.');
   process.exit(1);
 }
 
