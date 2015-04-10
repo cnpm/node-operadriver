@@ -1,7 +1,30 @@
 OperaDriver
 =======
 
-___This project forked from [giggio/node-chromedriver](https://github.com/giggio/node-chromedriver).
+[![NPM version][npm-image]][npm-url]
+[![build status][travis-image]][travis-url]
+[![Gittip][gittip-image]][gittip-url]
+[![David deps][david-image]][david-url]
+[![iojs version][iojs-image]][iojs-url]
+[![node version][node-image]][node-url]
+[![npm download][download-image]][download-url]
+
+[npm-image]: https://img.shields.io/npm/v/operadriver.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/operadriver
+[travis-image]: https://img.shields.io/travis/cnpm/operadriver.svg?style=flat-square
+[travis-url]: https://travis-ci.org/cnpm/operadriver
+[gittip-image]: https://img.shields.io/gittip/fengmk2.svg?style=flat-square
+[gittip-url]: https://www.gittip.com/fengmk2/
+[david-image]: https://img.shields.io/david/cnpm/operadriver.svg?style=flat-square
+[david-url]: https://david-dm.org/cnpm/operadriver
+[iojs-image]: https://img.shields.io/badge/io.js-%3E=_1.0-yellow.svg?style=flat-square
+[iojs-url]: http://iojs.org/
+[node-image]: https://img.shields.io/badge/node.js-%3E=_0.10-green.svg?style=flat-square
+[node-url]: http://nodejs.org/download/
+[download-image]: https://img.shields.io/npm/dm/operadriver.svg?style=flat-square
+[download-url]: https://npmjs.org/package/operadriver
+
+___This project forked from [giggio/node-chromedriver](https://github.com/giggio/node-chromedriver).___
 
 An NPM wrapper for Selenium [OperaDriver](https://github.com/operasoftware/operachromiumdriver/releases).
 
