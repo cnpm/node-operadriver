@@ -4,7 +4,7 @@ var AdmZip = require('adm-zip')
 var cp = require('child_process')
 var fs = require('fs')
 var helper = require('./lib/operadriver')
-var http = require('http')
+var urllib = require('urllib')
 var kew = require('kew')
 var npmconf = require('npmconf')
 var mkdirp = require('mkdirp')
@@ -16,11 +16,9 @@ var util = require('util')
 var libPath = path.join(__dirname, 'lib', 'operadriver')
 var cdnUrl = process.env.npm_config_operadriver_cdnurl ||
   process.env.OPERADRIVER_CDNURL ||
-  'http://78red6.com5.z0.glb.qiniucdn.com/dist/operadriver'
-  // 'http://cnpmjs.org/mirrors/operadriver'
+  'http://cnpmjs.org/mirrors/operadriver'
 cdnUrl = cdnUrl.replace(/\/+$/, '')
-// var downloadUrl = cdnUrl + '/%s/operadriver_%s.zip'
-var downloadUrl = cdnUrl + '/operadriver_%s.zip'
+var downloadUrl = cdnUrl + '/%s/operadriver_%s.zip'
 var platform = process.platform
 
 if (platform === 'linux') {
@@ -31,16 +29,16 @@ if (platform === 'linux') {
   }
 } else if (platform === 'darwin') {
   if (process.arch === 'x64') {
-    platform = 'mac32'
+    platform = 'mac64'
   } else {
-    platform = 'mac32'
+    platform = 'mac64'
   }
 } else if (platform !== 'win32') {
   console.log('Unexpected platform or architecture:', process.platform, process.arch)
   process.exit(1)
 }
 
-downloadUrl = util.format(downloadUrl, platform);
+downloadUrl = util.format(downloadUrl, helper.version, platform);
 
 var fileName = downloadUrl.split('/').pop()
 
@@ -60,7 +58,7 @@ npmconf.load(function(err, conf) {
   promise = promise.then(function () {
     console.log('Downloading', downloadUrl)
     console.log('Saving to', downloadedFile)
-    return requestBinary(getRequestOptions(conf.get('proxy')), downloadedFile)
+    return requestBinary(downloadUrl, downloadedFile)
   })
 
   promise.then(function () {
@@ -74,6 +72,7 @@ npmconf.load(function(err, conf) {
   })
   .then(function () {
     console.log('Done. OperaDriver binary available at', helper.path)
+    process.exit(0)
   })
   .fail(function (err) {
     console.log(err)
@@ -109,56 +108,37 @@ function findSuitableTempDirectory(npmConf) {
   process.exit(1);
 }
 
-
-function getRequestOptions(proxyUrl) {
-  if (proxyUrl) {
-    var options = url.parse(proxyUrl)
-    options.path = downloadUrl
-    options.headers = { Host: url.parse(downloadUrl).host }
-    // Turn basic authorization into proxy-authorization.
-    if (options.auth) {
-      options.headers['Proxy-Authorization'] = 'Basic ' + new Buffer(options.auth).toString('base64')
-      delete options.auth
-    }
-
-    return options
-  } else {
-    return url.parse(downloadUrl)
-  }
-}
-
-
-function requestBinary(requestOptions, filePath) {
+function requestBinary(downloadUrl, filePath) {
   var deferred = kew.defer()
 
   var count = 0
   var notifiedCount = 0
   var outFile = fs.openSync(filePath, 'w')
 
-  var client = http.get(requestOptions, function (response) {
-    var status = response.statusCode
-    console.log('Receiving...')
-
-    if (status === 200) {
-      response.addListener('data',   function (data) {
-        fs.writeSync(outFile, data, 0, data.length, null)
-        count += data.length
-        if ((count - notifiedCount) > 800000) {
-          console.log('Received ' + Math.floor(count / 1024) + 'K...')
-          notifiedCount = count
-        }
-      })
-
-      response.addListener('end',   function () {
-        console.log('Received ' + Math.floor(count / 1024) + 'K total.')
-        fs.closeSync(outFile)
-        deferred.resolve(true)
-      })
-
-    } else {
-      client.abort()
-      deferred.reject('Error with http request: ' + util.inspect(response.headers))
+  urllib.request(downloadUrl, {
+    followRedirect: true,
+    customResponse: true
+  }, function (err, _, response) {
+    if (err) {
+      return deferred.reject(err);
     }
+    var status = response.statusCode
+    console.log('Receiving..., status: %s', status)
+
+    response.addListener('data',   function (data) {
+      fs.writeSync(outFile, data, 0, data.length, null)
+      count += data.length
+      if ((count - notifiedCount) > 800000) {
+        console.log('Received ' + Math.floor(count / 1024) + 'K...')
+        notifiedCount = count
+      }
+    })
+
+    response.addListener('end',   function () {
+      console.log('Received ' + Math.floor(count / 1024) + 'K total.')
+      fs.closeSync(outFile)
+      deferred.resolve(true)
+    })
   })
 
   return deferred.promise
@@ -206,8 +186,6 @@ function copyIntoPlace(tmpPath, targetPath) {
 
   return kew.all(promises);
 }
-
-
 
 function fixFilePermissions() {
   // Check that the binary is user-executable and fix it if it isn't (problems with unzip library)
