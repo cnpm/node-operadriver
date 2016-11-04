@@ -55,19 +55,19 @@ To use a mirror of the OperaDriver binaries use npm config property `operadriver
 Default is `http://cnpmjs.org/mirrors/operadriver`.
 
 ```shell
-npm install operadriver --operadriver_cdnurl=http://npm.taobao.org/mirrors/operadriver
+npm install operadriver --operadriver_cdnurl=https://npm.taobao.org/mirrors/operadriver
 ```
 
 Or add property into your [`.npmrc`](https://docs.npmjs.com/files/npmrc) file.
 
 ```ini
-operadriver_cdnurl=http://npm.taobao.org/mirrors/operadriver
+operadriver_cdnurl=https://npm.taobao.org/mirrors/operadriver
 ```
 
 Another option is to use PATH variable `OPERADRIVER_CDNURL`.
 
 ```shell
-OPERADRIVER_CDNURL=http://npm.taobao.org/mirrors/operadriver npm install operadriver
+OPERADRIVER_CDNURL=https://npm.taobao.org/mirrors/operadriver npm install operadriver
 ```
 
 Running

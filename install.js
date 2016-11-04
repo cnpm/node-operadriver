@@ -16,7 +16,7 @@ var util = require('util')
 var libPath = path.join(__dirname, 'lib', 'operadriver')
 var cdnUrl = process.env.npm_config_operadriver_cdnurl ||
   process.env.OPERADRIVER_CDNURL ||
-  'http://cnpmjs.org/mirrors/operadriver'
+  'https://cnpmjs.org/mirrors/operadriver'
 cdnUrl = cdnUrl.replace(/\/+$/, '')
 var downloadUrl = cdnUrl + '/%s/operadriver_%s.zip'
 var platform = process.platform
