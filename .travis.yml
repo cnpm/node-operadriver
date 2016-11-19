@@ -1,7 +1,11 @@
 language: node_js
 node_js:
-  - '0.10'
   - '0.12'
-  - 'iojs-1'
-  - 'iojs-2'
-script: "npm install && timeout 10 ./bin/operadriver || test $? -eq 124"
+  - '4'
+  - '6'
+  - '7'
+os:
+  - linux
+  - osx
+install: 'npm install'
+script: './test-driver.sh'
