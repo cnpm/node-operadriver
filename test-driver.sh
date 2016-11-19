@@ -1,5 +1,5 @@
 # Start ChromeDriver and make it non-blocking with ampersand
-./bin/chromedriver &
+./bin/operadriver &
 
 # Keep track of the ChromeDrivers Process ID
 TASK_PID=$!
