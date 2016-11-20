@@ -1,4 +1,9 @@
 
+1.0.0 / 2016-11-20
+==================
+
+  * feat: Add operadriver to path and add OS X and Linux testing
+
 0.2.3 / 2016-11-04
 ==================
 
